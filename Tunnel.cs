@@ -11,7 +11,7 @@ namespace TCPTunnel2_GUI
         [UI] private Button btnConnect = null;
         [UI] private Label lblStatus = null;
         //State
-        private bool connected = false;
+        private bool connected = true;
         private Network networkThread;
 
         public Tunnel() : this(new Builder("Tunnel.glade")) { }
@@ -20,6 +20,7 @@ namespace TCPTunnel2_GUI
         {
             builder.Autoconnect(this);
             networkThread = new Network(GUICallback);
+            UpdateGUI();
         }
 
         private void Window_DeleteEvent(object sender, DeleteEventArgs a)

@@ -26,8 +26,10 @@ namespace TCPTunnel2_GUI
 
         private void WatchdogLoop()
         {
+            long nextUpdate = 0;
             while (running)
             {
+                long currentTime = DateTime.UtcNow.Ticks;
                 if (currentState)
                 {
                     int newCount = udpServer.GetConnections().Count;
@@ -41,11 +43,21 @@ namespace TCPTunnel2_GUI
                         }
                         else
                         {
-                            guiData.labelText = $"{clientConnected} connected";
+                            guiData.labelText = $"{clientConnected} connected, speed: {guiData.GetSpeedString()}";
                             guiData.iconName = "gtk-connect";
                         }
                         UpdateGUI();
                     }
+                }
+                if (currentTime > nextUpdate)
+                {
+                    nextUpdate = currentTime + TimeSpan.TicksPerSecond;
+                    if (clientConnected > 0)
+                    {
+                        guiData.labelText = $"{clientConnected} connected, {guiData.GetSpeedString()}";
+                        guiData.iconName = "gtk-connect";
+                    }
+                    UpdateGUI();
                 }
                 Thread.Sleep(50);
             }
@@ -62,7 +74,8 @@ namespace TCPTunnel2_GUI
                 clientConnected = -1;
                 tunnelSettings = new TunnelSettings();
                 tunnelSettings.Load("TunnelSettings.txt");
-                udpServer = new UDPServer(tunnelSettings);
+                guiData.statistics = new Statistics();
+                udpServer = new UDPServer(tunnelSettings, guiData.statistics);
                 if (tunnelSettings.tunnelServer == "")
                 {
                     tunnelServer = new TunnelServer(tunnelSettings, udpServer);
@@ -88,7 +101,7 @@ namespace TCPTunnel2_GUI
                 guiData.labelText = "Disconnected";
                 guiData.iconName = "gtk-no";
                 UpdateGUI();
-            }            
+            }
         }
 
         private void UpdateGUI()

@@ -20,11 +20,13 @@ namespace TCPTunnel2_GUI
         {
             builder.Autoconnect(this);
             networkThread = new Network(GUICallback);
+            DeleteEvent += Window_DeleteEvent;
             UpdateGUI();
         }
 
         private void Window_DeleteEvent(object sender, DeleteEventArgs a)
         {
+            networkThread.Stop();
             Application.Quit();
         }
 

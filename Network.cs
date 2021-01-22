@@ -63,6 +63,12 @@ namespace TCPTunnel2_GUI
             }
         }
 
+        public void Stop()
+        {
+            SetState(false);
+            running = false;
+        }
+
         public void SetState(bool state)
         {
             if (state == currentState)
